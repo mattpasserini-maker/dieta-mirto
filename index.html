@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>🐾 Dieta Mirto</title>
+<style>
+/* ============================================================
+   VARIABILI & RESET
+   ============================================================ */
+:root {
+  --bg:           #F7F2E8;
+  --surface:      #FFFFFF;
+  --surface-alt:  #FEFCF7;
+  --green:        #4A7A55;
+  --green-dark:   #345A3E;
+  --green-light:  #E8F4EC;
+  --amber:        #C47C2A;
+  --amber-light:  #FFF4E0;
+  --red:          #B94040;
+  --red-light:    #FFF0F0;
+  --blue:         #3A6A99;
+  --blue-light:   #EEF4FC;
+  --text:         #241E14;
+  --text-mid:     #6B5F52;
+  --text-dim:     #B0A89C;
+  --border:       #E2D8C8;
+  --radius:       18px;
+  --radius-sm:    11px;
+  --shadow:       0 3px 14px rgba(74,122,85,.10);
+  --shadow-lg:    0 6px 24px rgba(74,122,85,.15);
+  --fh:           Georgia, 'Palatino Linotype', 'Book Antiqua', serif;
+  --fb:           Verdana, 'DejaVu Sans', Tahoma, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--fb);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  padding-bottom: 72px;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.hdr {
+  background: linear-gradient(135deg, var(--green-dark) 0%, var(--green) 100%);
+  color: #fff;
+  padding: .9rem 1.1rem .4rem;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 2px 16px rgba(0,0,0,.22);
+}
+.hdr-top { display: flex; align-items: center; gap: .6rem; }
+.hdr-paw { font-size: 1.8rem; line-height: 1; }
+.hdr-title { font-family: var(--fh); font-size: 1.25rem; font-weight: normal; letter-spacing: .3px; }
+.hdr-sub { font-size: .68rem; opacity: .78; margin-top: 1px; line-height: 1.4; }
+.tab-bar { display: flex; gap: 4px; margin-top: .55rem; }
+.tab-btn {
+  flex: 1; border: none; cursor: pointer;
+  background: rgba(255,255,255,.15);
+  color: rgba(255,255,255,.8);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  font-family: var(--fb); font-size: .8rem;
+  padding: .48rem .3rem;
+  transition: background .18s, color .18s;
+  min-height: 40px;
+}
+.tab-btn.on { background: var(--bg); color: var(--green-dark); font-weight: 700; }
+
+/* ============================================================
+   TAB PAGES
+   ============================================================ */
+.page { display: none; }
+.page.on { display: block; }
+
+/* ============================================================
+   DAY SELECTOR
+   ============================================================ */
+.day-strip-wrap {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: .6rem .9rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.day-strip-wrap::-webkit-scrollbar { display: none; }
+.day-strip { display: flex; gap: 7px; min-width: max-content; }
+.day-pill {
+  display: flex; align-items: center; gap: 4px;
+  padding: .48rem .85rem;
+  border-radius: 50px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text-mid);
+  font-family: var(--fb); font-size: .78rem;
+  cursor: pointer; white-space: nowrap;
+  min-height: 44px;
+  transition: all .16s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.day-pill.veg::after {
+  content: '🥦';
+  font-size: .62rem;
+  position: absolute; top: -2px; right: -2px;
+}
+.day-pill.on {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(74,122,85,.35);
+}
+
+/* ============================================================
+   DAY CONTENT
+   ============================================================ */
+.day-wrap { padding: .9rem; }
+
+.day-banner {
+  background: var(--green-light);
+  border: 1.5px solid var(--green);
+  border-radius: var(--radius);
+  padding: .8rem 1rem;
+  margin-bottom: .8rem;
+  display: flex; align-items: center; gap: .7rem;
+}
+.day-banner-emoji { font-size: 2rem; flex-shrink: 0; }
+.day-banner-body h2 {
+  font-family: var(--fh); font-size: 1.1rem;
+  color: var(--green-dark); font-weight: normal;
+}
+.badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+.badge {
+  font-size: .65rem; padding: 2px 8px;
+  border-radius: 50px; font-weight: 700;
+}
+.b-org  { background: #FFE8D0; color: #7A3800; }
+.b-veg  { background: #D5EDDA; color: #1E5E2A; }
+.b-tmpl { background: #DDE6F2; color: #1A3A60; }
+
+/* Alerts */
+.alert {
+  border-radius: var(--radius-sm);
+  padding: .7rem .9rem;
+  margin-bottom: .75rem;
+  font-size: .8rem;
+  line-height: 1.5;
+}
+.alert strong { display: block; margin-bottom: 2px; font-size: .82rem; }
+.alert-warn  { background: var(--red-light);  border-left: 4px solid var(--red);  color: #5A1A1A; }
+.alert-info  { background: var(--blue-light); border-left: 4px solid var(--blue); color: #162840; }
+.alert-amber { background: var(--amber-light);border-left: 4px solid var(--amber);color: #4A2800; }
+
+/* Actions bar */
+.day-actions { display: flex; gap: 8px; margin-bottom: .9rem; }
+.btn {
+  flex: 1; padding: .6rem .5rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--fb); font-size: .78rem;
+  cursor: pointer; min-height: 44px;
+  transition: opacity .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { opacity: .75; }
+.btn-exp { border: 2px solid var(--green-light); background: var(--green-light); color: var(--green-dark); }
+.btn-rst { border: 2px solid var(--border); background: var(--surface); color: var(--text-mid); }
+
+/* ============================================================
+   MEAL CARDS
+   ============================================================ */
+.meal-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  margin-bottom: .75rem;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+.meal-card.open { box-shadow: var(--shadow-lg); }
+
+.meal-prog { height: 3px; background: var(--border); }
+.meal-prog-bar { height: 100%; background: var(--green); border-radius: 3px; transition: width .28s; }
+
+.meal-head {
+  display: flex; align-items: center; gap: .65rem;
+  padding: .8rem .95rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.meal-ico { font-size: 1.35rem; flex-shrink: 0; }
+.meal-name {
+  font-family: var(--fh); font-size: .98rem;
+  color: var(--text); flex: 1;
+}
+.meal-cnt { font-size: .72rem; color: var(--text-mid); font-weight: 700; }
+.meal-arr {
+  color: var(--text-dim); font-size: .75rem;
+  transition: transform .2s;
+  margin-left: 4px;
+}
+.meal-card.open .meal-arr { transform: rotate(180deg); }
+
+.meal-body {
+  border-top: 1px solid var(--border);
+  display: none;
+}
+.meal-card.open .meal-body { display: block; }
+
+/* Checklist */
+.cklist { list-style: none; }
+.cklist li {
+  display: flex; align-items: flex-start; gap: .7rem;
+  padding: .65rem .95rem;
+  border-bottom: 1px solid #F5F0E6;
+  min-height: 50px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .14s;
+}
+.cklist li:last-child { border-bottom: none; }
+.cklist li.done { background: #F4FBF5; }
+.cklist li.done .ci-name { text-decoration: line-through; color: var(--text-dim); }
+.cklist li.done .ci-qty  { color: var(--text-dim); }
+
+.chk {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; margin-top: 2px;
+}
+.cklist li.done .chk { background: var(--green); border-color: var(--green); }
+.chk-inner { display: none; width: 6px; height: 10px; border: 2px solid #fff; border-top: none; border-left: none; transform: rotate(45deg) translate(-1px,-1px); }
+.cklist li.done .chk-inner { display: block; }
+
+.ci-body { flex: 1; }
+.ci-name { font-size: .86rem; color: var(--text); line-height: 1.35; }
+.ci-note { font-size: .7rem; color: var(--text-mid); margin-top: 2px; line-height: 1.4; }
+.ci-qty  { font-size: .84rem; color: var(--green-dark); font-weight: 700; flex-shrink: 0; text-align: right; min-width: 52px; }
+
+/* Optional (CDS-22) */
+.opt .ci-name { color: var(--amber); }
+.opt .ci-qty  { color: var(--amber); }
+
+/* ============================================================
+   INFO PAGE
+   ============================================================ */
+.info-wrap { padding: .9rem; }
+
+.acc {
+  background: var(--surface);
+  border-radius: var(--radius);
+  margin-bottom: .85rem;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.acc-head {
+  display: flex; align-items: center; gap: .65rem;
+  padding: .85rem .95rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.acc-ico { font-size: 1.25rem; }
+.acc-head h3 { font-family: var(--fh); font-size: .98rem; color: var(--text); font-weight: normal; flex: 1; }
+.acc-arr { color: var(--text-dim); font-size: .75rem; transition: transform .2s; }
+.acc.open .acc-arr { transform: rotate(180deg); }
+
+.acc-body { display: none; border-top: 1px solid var(--border); padding: .95rem; }
+.acc.open .acc-body { display: block; }
+
+/* Info typography */
+.it { font-size: .83rem; line-height: 1.6; color: var(--text); }
+.it + .it { margin-top: .5rem; }
+.il { font-weight: 700; color: var(--green-dark); }
+
+/* Info tables */
+.itbl { width: 100%; border-collapse: collapse; font-size: .78rem; margin: .55rem 0; }
+.itbl th { background: var(--green-light); color: var(--green-dark); padding: .45rem .5rem; text-align: left; }
+.itbl td { padding: .45rem .5rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.itbl tr:last-child td { border-bottom: none; }
+.itbl tr:nth-child(even) td { background: #FAFAF5; }
+
+/* Info note boxes */
+.i-note {
+  margin-top: .65rem; padding: .55rem .75rem;
+  font-size: .78rem; line-height: 1.5;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.i-green { background: var(--green-light); border-left: 3px solid var(--green);   color: #1A4025; }
+.i-amber { background: var(--amber-light); border-left: 3px solid var(--amber);   color: #4A2800; }
+.i-red   { background: var(--red-light);   border-left: 3px solid var(--red);     color: #5A1A1A; }
+.i-blue  { background: var(--blue-light);  border-left: 3px solid var(--blue);    color: #162840; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: .45rem 1rem calc(.45rem + env(safe-area-inset-bottom));
+  font-size: .67rem; color: var(--text-dim);
+  text-align: center; z-index: 100;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER + TAB BAR
+     ============================================================ -->
+<header class="hdr">
+  <div class="hdr-top">
+    <span class="hdr-paw">🐾</span>
+    <div>
+      <div class="hdr-title">Dieta Mirto</div>
+      <div class="hdr-sub">Corgi · 4 mesi · BARF · 280 gr/die · 4 pasti<br>Dott.ssa A. Fabbri · 16/05/2026</div>
+    </div>
+  </div>
+  <nav class="tab-bar">
+    <button class="tab-btn on" onclick="switchTab('piano',this)">📅 Piano settimanale</button>
+    <button class="tab-btn"    onclick="switchTab('info',this)">ℹ️ Alternative &amp; Info</button>
+  </nav>
+</header>
+
+<!-- ============================================================
+     PAGE: PIANO
+     ============================================================ -->
+<div id="pg-piano" class="page on">
+
+  <div class="day-strip-wrap">
+    <div class="day-strip" id="dayStrip"></div>
+  </div>
+
+  <div class="day-wrap" id="dayWrap"></div>
+
+</div>
+
+<!-- ============================================================
+     PAGE: INFO
+     ============================================================ -->
+<div id="pg-info" class="page">
+<div class="info-wrap">
+
+  <!-- SOSTITUZIONE OP -->
+  <div class="acc" id="a-op">
+    <div class="acc-head" onclick="tog('a-op')">
+      <span class="acc-ico">🦴</span>
+      <h3>Sostituzione OP (Ossa Polpose)</h3>
+      <span class="acc-arr">▼</span>
+    </div>
+    <div class="acc-body">
+      <p class="it"><span class="il">Sostituzione TOTALE</span> — 130 gr OP non disponibili:</p>
+      <table class="itbl">
+        <tr><th>Sostituisci</th><th>Con</th></tr>
+        <tr>
+          <td>130 gr OP</td>
+          <td>3 gr farina d'ossa (1 cucchiaino da caffè)<br>+ CSO portata a <strong>200 gr</strong> totali nel giorno</td>
+        </tr>
+      </table>
+      <p class="i-note i-green">CSO totale 200 gr: distribuire nei pasti di mezzogiorno, pomeriggio e sera.</p>
+
+      <p class="it" style="margin-top:.75rem"><span class="il">Sostituzione PARZIALE</span> — per ogni 100 gr di colli di pollo mancanti:</p>
+      <table class="itbl">
+        <tr><th>Sostituisci</th><th>Con</th></tr>
+        <tr>
+          <td>100 gr colli di pollo</td>
+          <td>2,30 gr farina d'ossa + CSO <strong>+80 gr</strong> aggiuntivi</td>
+        </tr>
+      </table>
+
+      <p class="it" style="margin-top:.75rem"><span class="il">Esempi pratici</span> (target OP 130 gr/giorno):</p>
+      <table class="itbl">
+        <tr><th>OP disponibili</th><th>Farina d'ossa</th><th>CSO totale giorno</th></tr>
+        <tr><td>130 gr (tutto)</td><td>0</td><td>70 gr</td></tr>
+        <tr><td>30 gr (100 mancanti)</td><td>2,30 gr</td><td>150 gr</td></tr>
+        <tr><td>0 gr (tutto mancante)</td><td>3,00 gr</td><td>200 gr</td></tr>
+      </table>
+      <p class="i-note i-amber">La farina d'ossa va nel pasto del mattino al posto delle OP. La CSO aggiuntiva si distribuisce nei pasti successivi (mezzogiorno, pomeriggio, sera).</p>
+    </div>
+  </div>
+
+  <!-- VARIETÀ OP -->
+  <div class="acc" id="a-vop">
+    <div class="acc-head" onclick="tog('a-vop')">
+      <span class="acc-ico">🍗</span>
+      <h3>Varietà OP consentite</h3>
+      <span class="acc-arr">▼</span>
+    </div>
+    <div class="acc-body">
+      <p class="it">Il piano base usa solo colli di pollo (910 gr/settimana). È possibile sostituire fino a <strong>210 gr/settimana</strong> con:</p>
+      <table class="itbl" style="margin-top:.5rem">
+        <tr><th>Alternativa OP</th></tr>
+        <tr><td>Ali di pollo</td></tr>
+        <tr><td>Coscia di pollo</td></tr>
+        <tr><td>Carcassa di coniglio</td></tr>
+      </table>
+      <p class="i-note i-green">Minimo garantito: <strong>700 gr/settimana di colli di pollo</strong> sempre rispettato.</p>
+    </div>
+  </div>
+
+  <!-- VERDURA -->
+  <div class="acc" id="a-verd">
+    <div class="acc-head" onclick="tog('a-verd')">
+      <span class="acc-ico">🥦</span>
+      <h3>Verdura — Preparazione &amp; Varietà</h3>
+      <span class="acc-arr">▼</span>
+    </div>
+    <div class="acc-body">
+      <p class="it"><span class="il">Giorni con verdura:</span> Lunedì, Mercoledì, Venerdì, Domenica (4 giorni/settimana · 30 gr/giorno).</p>
+      <p class="it"><span class="il">Preparazione:</span> Lessata o cotta a vapore, poi frullata.</p>
+      <table class="itbl" style="margin:.5rem 0">
+        <tr><th>Verdura consentita</th></tr>
+        <tr><td>Carote</td></tr>
+        <tr><td>Zucca</td></tr>
+        <tr><td>Finocchio</td></tr>
+      </table>
+      <p class="i-note i-amber">⚠️ Non mescolare mai la verdura (cotta) con CSO/OP (crudi) né con la trippa, fino al momento di servire.</p>
+      <p class="i-note i-green">Preparabile in anticipo per 2–3 giorni. Conservare in frigo in contenitore ermetico separato da carne/ossa.</p>
+    </div>
+  </div>
+
+  <!-- SCONGELAMENTO -->
+  <div class="acc" id="a-scong">
+    <div class="acc-head" onclick="tog('a-scong')">
+      <span class="acc-ico">🧊</span>
+      <h3>Guida allo scongelamento</h3>
+      <span class="acc-arr">▼</span>
+    </div>
+    <div class="acc-body">
+      <table class="itbl">
+        <tr><th>Quando</th><th>Cosa</th><th>Note</th></tr>
+        <tr>
+          <td><strong>Domenica sera</strong></td>
+          <td>CSO Block 1 (250 gr)</td>
+          <td>Copre lun/mar/mer (70 gr/giorno). ~40 gr residui in frigo per giovedì</td>
+        </tr>
+        <tr>
+          <td><strong>Mercoledì sera</strong></td>
+          <td>CSO Block 2 (250 gr)</td>
+          <td>Giovedì usa 30 gr Block 2 + 40 gr Block 1 = 70 gr. Poi ven/sab/dom 70 gr/die. ~10 gr surplus → ricongela</td>
+        </tr>
+        <tr>
+          <td><strong>Ogni sera</strong></td>
+          <td>Trippa verde (30 gr)</td>
+          <td>Scongela la porzione del giorno successivo in frigo la sera precedente</td>
+        </tr>
+        <tr>
+          <td><strong>Mercoledì mattina</strong></td>
+          <td>Cuore (porzione 100 gr)</td>
+          <td>Apri porzione 100 gr al mattino. Usa 50 gr a mezzogiorno. Conserva 50 gr in ermetico in frigo → giovedì a mezzogiorno. Consumare entro 24 h</td>
+        </tr>
+        <tr>
+          <td><strong>Giorno stesso</strong></td>
+          <td>Fegato / Milza (sacchetto 50 gr)</td>
+          <td>Apri il sacchetto il giorno stesso dell'uso</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- INTEGRATORI -->
+  <div class="acc" id="a-int">
+    <div class="acc-head" onclick="tog('a-int')">
+      <span class="acc-ico">💊</span>
+      <h3>Integratori — Scheda completa</h3>
+      <span class="acc-arr">▼</span>
+    </div>
+    <div class="acc-body">
+      <table class="itbl">
+        <tr><th>Integratore</th><th>Dose</th><th>Quando</th><th>Durata</th></tr>
+        <tr>
+          <td>Normalia Extra</td>
+          <td>½ compressa</td>
+          <td>Mezzogiorno + Sera (con il cibo)</td>
+          <td>Fino a 60 giorni</td>
+        </tr>
+        <tr>
+          <td>Omega-3 1000 mg<br><small>(Omegor-Vitality / Duomega)</small></td>
+          <td>1 capsula</td>
+          <td>Mezzogiorno (con il cibo)</td>
+          <td>Fino a controllo nutrizionale</td>
+        </tr>
+        <tr>
+          <td>Olio di cocco</td>
+          <td>8 gr totali<br><small>(2 cucchiaini da tè)</small></td>
+          <td>4 gr pomeriggio + 4 gr sera</td>
+          <td>Giornaliero</td>
+        </tr>
+        <tr>
+          <td>CDS-22 (450 miliardi)</td>
+          <td>½ bustina</td>
+          <td>Mezzogiorno (con il cibo)</td>
+          <td>10 giorni/mese consecutivi</td>
+        </tr>
+      </table>
+      <p class="i-note i-red">⚠️ <strong>CDS-22:</strong> Non è un integratore continuativo quotidiano. Somministrare ½ bustina ogni giorno per 10 giorni consecutivi al mese. Nei restanti giorni non somministrare.</p>
+      <p class="i-note i-amber">ℹ️ <strong>Nota Normalia Extra:</strong> Il piano nutrizionale prescriveva la dose a mattina e sera. Poiché il pasto del mattino è riservato alle sole OP, la dose mattutina è stata spostata a mezzogiorno. Comunicare alla Dott.ssa Fabbri al prossimo controllo per conferma.</p>
+    </div>
+  </div>
+
+  <!-- NOTE NUTRIZIONISTA -->
+  <div class="acc" id="a-note">
+    <div class="acc-head" onclick="tog('a-note')">
+      <span class="acc-ico">📊</span>
+      <h3>Note nutrizionista — Discrepanza mensile</h3>
+      <span class="acc-arr">▼</span>
+    </div>
+    <div class="acc-body">
+      <p class="it">I target mensili del piano (Fegato 660 gr, Cuore 500 gr, Milza 500 gr) non sono completamente raggiungibili con i vincoli di porzionamento e il limite settimanale di 100 gr per il fegato.</p>
+      <p class="it" style="margin-top:.5rem">Il piano settimanale ottimizzato produce: Fegato ~400 gr/mese, Cuore ~400 gr/mese, Milza ~600 gr/mese. Il totale mensile degli organi (1400 gr) è in linea con il target di 1500 gr/mese.</p>
+
+      <p class="it" style="margin-top:.75rem"><span class="il">Distribuzione organi settimanale:</span></p>
+      <table class="itbl">
+        <tr><th>Organo</th><th>Target/sett.</th><th>Pianificato</th><th>Delta</th></tr>
+        <tr><td>Fegato</td><td>max 100 gr</td><td>100 gr (2×50)</td><td>0</td></tr>
+        <tr><td>Cuore</td><td>~125 gr</td><td>100 gr (2×50)</td><td>−25 gr</td></tr>
+        <tr><td>Milza</td><td>~125 gr</td><td>150 gr (3×50)</td><td>+25 gr</td></tr>
+        <tr><td><strong>Totale organi</strong></td><td><strong>350 gr</strong></td><td><strong>350 gr</strong></td><td><strong>0</strong></td></tr>
+      </table>
+      <p class="i-note i-blue">La milza compensa parzialmente il cuore. Nessun impatto clinico atteso secondo il piano. Per allinearsi ai target individuali, contattare la Dott.ssa Fabbri al prossimo controllo.</p>
+    </div>
+  </div>
+
+  <p style="text-align:center;font-size:.72rem;color:var(--text-dim);padding:.25rem 0 .5rem">
+    Piano nutrizionale: Dott.ssa Arianna Fabbri · 16/05/2026<br>
+    <em>Non sostituisce il parere del medico veterinario nutrizionista</em>
+  </p>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  Versione: 1.1 &nbsp;|&nbsp; Aggiornato: 18/05/2026 &nbsp;|&nbsp; Autore: Matteo Passerini
+</footer>
+
+<script>
+/* ============================================================
+   DATI — fedeli al documento piano_dieta_mirto_settimanale_v3.md
+   Fonte: Consulenza Dott.ssa Arianna Fabbri, 16/05/2026
+   ============================================================ */
+
+const EMOJI_G = ['🌅','🍂','🌿','🍁','🌻','🐾','☀️'];
+
+/*
+  Struttura item: { n: nome, q: quantità, note?: stringa, opt?: true }
+  opt = true → CDS-22 (condizionale, ciclo mensile)
+*/
+const PIANI = [
+  // ─── 0: LUNEDÌ — Template B — Fegato — Verdura ✓ ───────────────────────────
+  {
+    label:'Lunedì', template:'B', organo:'Fegato', veg:true,
+    alerts:[
+      { t:'info', title:'🧊 CSO Block 1',
+        txt:'Assicurati che il Block 1 CSO (250 gr) sia stato scongelato domenica sera. Copre lun/mar/mer.' }
+    ],
+    pasti:{
+      mattina:{ico:'🌅',lbl:'Mattina',items:[
+        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
+      ]},
+      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
+        {n:'Fegato', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
+        {n:'CSO (Block 1)', q:'35 gr'},
+        {n:'Verdura lessata/frullata', q:'30 gr', note:'Mescola solo al momento di servire'},
+        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
+        {n:'Normalia Extra', q:'½ compressa'},
+        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
+      ]},
+      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
+        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
+        {n:'Olio di cocco', q:'4 gr'}
+      ]},
+      sera:{ico:'🌙',lbl:'Sera',items:[
+        {n:'CSO (Block 1)', q:'35 gr'},
+        {n:'Olio di cocco', q:'4 gr'},
+        {n:'Normalia Extra', q:'½ compressa'}
+      ]}
+    }
+  },
+
+  // ─── 1: MARTEDÌ — Template A — Milza — No verdura ──────────────────────────
+  {
+    label:'Martedì', template:'A', organo:'Milza', veg:false,
+    alerts:[],
+    pasti:{
+      mattina:{ico:'🌅',lbl:'Mattina',items:[
+        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
+      ]},
+      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
+        {n:'Milza', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
+        {n:'CSO (Block 1)', q:'35 gr'},
+        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
+        {n:'Normalia Extra', q:'½ compressa'},
+        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
+      ]},
+      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
+        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
+        {n:'Olio di cocco', q:'4 gr'}
+      ]},
+      sera:{ico:'🌙',lbl:'Sera',items:[
+        {n:'CSO (Block 1)', q:'35 gr'},
+        {n:'Olio di cocco', q:'4 gr'},
+        {n:'Normalia Extra', q:'½ compressa'}
+      ]}
+    }
+  },
+
+  // ─── 2: MERCOLEDÌ — Template B — Cuore — Verdura ✓ ─────────────────────────
+  {
+    label:'Mercoledì', template:'B', organo:'Cuore', veg:true,
+    alerts:[
+      { t:'warn', title:'🫀 Cuore — Azione mattina',
+        txt:'Apri porzione da 100 gr al mattino. Usa 50 gr a mezzogiorno. Conserva i restanti 50 gr in contenitore ermetico in frigo → da usare giovedì a mezzogiorno. Consumare entro 24 ore.' },
+      { t:'info', title:'🧊 Scongelamento sera',
+        txt:'Stasera: scongela CSO Block 2 (250 gr) in frigo per giovedì.' }
+    ],
+    pasti:{
+      mattina:{ico:'🌅',lbl:'Mattina',items:[
+        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
+      ]},
+      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
+        {n:'Cuore', q:'50 gr', note:'Apri porzione 100 gr al mattino; usa 50 gr ora, conserva 50 gr in frigo per giovedì'},
+        {n:'CSO (Block 1)', q:'35 gr'},
+        {n:'Verdura lessata/frullata', q:'30 gr', note:'Mescola solo al momento di servire'},
+        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
+        {n:'Normalia Extra', q:'½ compressa'},
+        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
+      ]},
+      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
+        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
+        {n:'Olio di cocco', q:'4 gr'}
+      ]},
+      sera:{ico:'🌙',lbl:'Sera',items:[
+        {n:'CSO (Block 1)', q:'35 gr'},
+        {n:'Olio di cocco', q:'4 gr'},
+        {n:'Normalia Extra', q:'½ compressa'}
+      ]}
+    }
+  },
+
+  // ─── 3: GIOVEDÌ — Template A — Cuore (frigo) — No verdura ─────────────────
+  {
+    label:'Giovedì', template:'A', organo:'Cuore', veg:false,
+    alerts:[
+      { t:'warn', title:'🫀 Cuore — Dal frigo',
+        txt:'Usa i 50 gr di cuore conservati ieri (mercoledì) in contenitore ermetico. Consumare entro 24 ore dall\'apertura.' },
+      { t:'amber', title:'🧊 CSO — Doppio blocco',
+        txt:'CSO giornaliera totale: ~40 gr residui Block 1 + 30 gr Block 2 = 70 gr. Suddividi 35 gr a mezzogiorno + 35 gr a sera.' }
+    ],
+    pasti:{
+      mattina:{ico:'🌅',lbl:'Mattina',items:[
+        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
+      ]},
+      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
+        {n:'Cuore', q:'50 gr', note:'Dalla porzione in frigo aperta mercoledì; consumare entro 24 h'},
+        {n:'CSO (40 gr Block 1 + 30 gr Block 2)', q:'35 gr', note:'Totale giorno 70 gr: usa i residui Block 1 (~40 gr) + inizio Block 2 (30 gr)'},
+        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
+        {n:'Normalia Extra', q:'½ compressa'},
+        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
+      ]},
+      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
+        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
+        {n:'Olio di cocco', q:'4 gr'}
+      ]},
+      sera:{ico:'🌙',lbl:'Sera',items:[
+        {n:'CSO (Block 2)', q:'35 gr'},
+        {n:'Olio di cocco', q:'4 gr'},
+        {n:'Normalia Extra', q:'½ compressa'}
+      ]}
+    }
+  },
+
+  // ─── 4: VENERDÌ — Template B — Fegato — Verdura ✓ ──────────────────────────
+  {
+    label:'Venerdì', template:'B', organo:'Fegato', veg:true,
+    alerts:[],
+    pasti:{
+      mattina:{ico:'🌅',lbl:'Mattina',items:[
+        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
+      ]},
+      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
+        {n:'Fegato', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
+        {n:'CSO (Block 2)', q:'35 gr'},
+        {n:'Verdura lessata/frullata', q:'30 gr', note:'Mescola solo al momento di servire'},
+        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
+        {n:'Normalia Extra', q:'½ compressa'},
+        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
+      ]},
+      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
+        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
+        {n:'Olio di cocco', q:'4 gr'}
+      ]},
+      sera:{ico:'🌙',lbl:'Sera',items:[
+        {n:'CSO (Block 2)', q:'35 gr'},
+        {n:'Olio di cocco', q:'4 gr'},
+        {n:'Normalia Extra', q:'½ compressa'}
+      ]}
+    }
+  },
+
+  // ─── 5: SABATO — Template A — Milza — No verdura ───────────────────────────
+  {
+    label:'Sabato', template:'A', organo:'Milza', veg:false,
+    alerts:[],
+    pasti:{
+      mattina:{ico:'🌅',lbl:'Mattina',items:[
+        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
+      ]},
+      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
+        {n:'Milza', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
+        {n:'CSO (Block 2)', q:'35 gr'},
+        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
+        {n:'Normalia Extra', q:'½ compressa'},
+        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
+      ]},
+      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
+        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
+        {n:'Olio di cocco', q:'4 gr'}
+      ]},
+      sera:{ico:'🌙',lbl:'Sera',items:[
+        {n:'CSO (Block 2)', q:'35 gr'},
+        {n:'Olio di cocco', q:'4 gr'},
+        {n:'Normalia Extra', q:'½ compressa'}
+      ]}
+    }
+  },
+
+  // ─── 6: DOMENICA — Template B — Milza — Verdura ✓ ──────────────────────────
+  {
+    label:'Domenica', template:'B', organo:'Milza', veg:true,
+    alerts:[
+      { t:'info', title:'🧊 Scongelamento sera',
+        txt:'Stasera: scongela CSO Block 1 (250 gr) in frigo per lunedì.' }
+    ],
+    pasti:{
+      mattina:{ico:'🌅',lbl:'Mattina',items:[
+        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
+      ]},
+      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
+        {n:'Milza', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
+        {n:'CSO (Block 2)', q:'35 gr'},
+        {n:'Verdura lessata/frullata', q:'30 gr', note:'Mescola solo al momento di servire'},
+        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
+        {n:'Normalia Extra', q:'½ compressa'},
+        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
+      ]},
+      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
+        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
+        {n:'Olio di cocco', q:'4 gr'}
+      ]},
+      sera:{ico:'🌙',lbl:'Sera',items:[
+        {n:'CSO (Block 2)', q:'35 gr'},
+        {n:'Olio di cocco', q:'4 gr'},
+        {n:'Normalia Extra', q:'½ compressa'}
+      ]}
+    }
+  }
+];
+
+/* ============================================================
+   STATE
+   Remap JS day (0=Sun) → piano index (0=Lun)
+   ============================================================ */
+const JS2IDX = {0:6, 1:0, 2:1, 3:2, 4:3, 5:4, 6:5};
+
+// checked[dayIdx][mealKey][itemIdx] = boolean
+const checked = {};
+for (let d = 0; d < 7; d++) {
+  checked[d] = { mattina:{}, mezzogiorno:{}, pomeriggio:{}, sera:{} };
+}
+
+let curDay = JS2IDX[new Date().getDay()];
+
+const MEAL_ORDER = ['mattina','mezzogiorno','pomeriggio','sera'];
+const ORG_ICO = { Fegato:'🩸', Milza:'🫁', Cuore:'🫀' };
+
+/* ============================================================
+   RENDER — DAY STRIP
+   ============================================================ */
+function renderStrip() {
+  const strip = document.getElementById('dayStrip');
+  strip.innerHTML = '';
+  for (let d = 0; d < 7; d++) {
+    const p = PIANI[d];
+    const btn = document.createElement('button');
+    btn.className = 'day-pill' + (p.veg ? ' veg' : '') + (d === curDay ? ' on' : '');
+    btn.innerHTML = `<span>${EMOJI_G[d]}</span> ${p.label}`;
+    btn.setAttribute('aria-label', p.label);
+    btn.onclick = () => selDay(d);
+    strip.appendChild(btn);
+  }
+  // Scroll active into center
+  setTimeout(() => {
+    const el = strip.querySelector('.on');
+    if (el) el.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+  }, 60);
+}
+
+/* ============================================================
+   RENDER — DAY CONTENT
+   ============================================================ */
+function renderDay() {
+  const p = PIANI[curDay];
+  let h = '';
+
+  /* Banner */
+  h += `
+  <div class="day-banner">
+    <div class="day-banner-emoji">${EMOJI_G[curDay]}</div>
+    <div class="day-banner-body">
+      <h2>${p.label}</h2>
+      <div class="badges">
+        <span class="badge b-org">${ORG_ICO[p.organo] || '🍖'} ${p.organo} 50 gr</span>
+        ${p.veg
+          ? '<span class="badge b-veg">🥦 Con verdura</span>'
+          : '<span class="badge b-tmpl">Senza verdura</span>'}
+        <span class="badge b-tmpl">Template ${p.template}</span>
+      </div>
+    </div>
+  </div>`;
+
+  /* Alerts */
+  for (const a of p.alerts) {
+    h += `<div class="alert alert-${a.t}"><strong>${a.title}</strong>${a.txt}</div>`;
+  }
+
+  /* Action buttons */
+  h += `
+  <div class="day-actions">
+    <button class="btn btn-exp" onclick="expandAll()">▼ Espandi tutti</button>
+    <button class="btn btn-rst" onclick="resetDay()">↺ Azzera spunte</button>
+  </div>`;
+
+  /* Meal cards */
+  for (const mk of MEAL_ORDER) {
+    const m = p.pasti[mk];
+    if (!m) continue;
+    const id = 'mc-' + mk;
+    const total = m.items.length;
+    const done  = countDone(curDay, mk);
+    const pct   = total ? (done / total * 100) : 0;
+
+    h += `
+    <div class="meal-card open" id="${id}">
+      <div class="meal-prog"><div class="meal-prog-bar" id="pb-${mk}" style="width:${pct}%"></div></div>
+      <div class="meal-head" onclick="togCard('${id}')">
+        <span class="meal-ico">${m.ico}</span>
+        <span class="meal-name">${m.lbl}</span>
+        <span class="meal-cnt" id="cnt-${mk}">${done}/${total}</span>
+        <span class="meal-arr">▼</span>
+      </div>
+      <div class="meal-body">
+        <ul class="cklist">`;
+
+    for (let i = 0; i < m.items.length; i++) {
+      const it = m.items[i];
+      const ck = !!checked[curDay][mk][i];
+      h += `
+          <li class="${ck ? 'done' : ''}${it.opt ? ' opt' : ''}"
+              onclick="togItem(${curDay},'${mk}',${i},'${id}')">
+            <div class="chk"><div class="chk-inner"></div></div>
+            <div class="ci-body">
+              <div class="ci-name">${it.n}</div>
+              ${it.note ? `<div class="ci-note">${it.note}</div>` : ''}
+            </div>
+            <div class="ci-qty">${it.q}</div>
+          </li>`;
+    }
+
+    h += `
+        </ul>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('dayWrap').innerHTML = h;
+}
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+function countDone(d, mk) {
+  return Object.values(checked[d][mk]).filter(Boolean).length;
+}
+
+function selDay(d) {
+  curDay = d;
+  renderStrip();
+  renderDay();
+}
+
+function togItem(d, mk, i, cardId) {
+  checked[d][mk][i] = !checked[d][mk][i];
+  const card = document.getElementById(cardId);
+  const li   = card.querySelectorAll('.cklist li')[i];
+  li.classList.toggle('done', checked[d][mk][i]);
+  const total = PIANI[d].pasti[mk].items.length;
+  const done  = countDone(d, mk);
+  document.getElementById('cnt-' + mk).textContent = `${done}/${total}`;
+  document.getElementById('pb-'  + mk).style.width = `${total ? done/total*100 : 0}%`;
+}
+
+function togCard(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function expandAll() {
+  document.querySelectorAll('.meal-card').forEach(c => c.classList.add('open'));
+}
+
+function resetDay() {
+  for (const mk of MEAL_ORDER) checked[curDay][mk] = {};
+  renderDay();
+}
+
+/* ============================================================
+   TAB SWITCHING
+   ============================================================ */
+function switchTab(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  btn.classList.add('on');
+}
+
+/* ============================================================
+   ACCORDION (INFO PAGE)
+   ============================================================ */
+function tog(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderStrip();
+renderDay();
+</script>
+</body>
+</html>
