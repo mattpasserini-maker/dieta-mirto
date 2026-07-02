@@ -309,35 +309,138 @@ body {
   font-size: .67rem; color: var(--text-dim);
   text-align: center; z-index: 100;
 }
+
+/* ============================================================
+   DATE NAVIGATION (v2.0)
+   ============================================================ */
+.date-nav {
+  display: flex; align-items: center; gap: .6rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: .6rem .9rem;
+}
+.date-arrow {
+  width: 44px; height: 44px; flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--green-dark);
+  font-size: 1.1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.date-arrow:active { opacity: .7; }
+.date-arrow:disabled { opacity: .3; cursor: default; border-color: var(--border); }
+.date-center { flex: 1; text-align: center; min-width: 0; }
+.date-main { font-family: var(--fh); font-size: 1rem; color: var(--text); line-height: 1.2; }
+.date-main.is-today { color: var(--green); font-weight: 700; }
+.date-badge {
+  display: inline-block; margin-top: 4px;
+  font-size: .66rem; font-weight: 700;
+  padding: 2px 9px; border-radius: 50px;
+  background: var(--green-light); color: var(--green-dark);
+}
+
+/* Start-date box (in cima alla pagina Piano) */
+.startbox {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin: .7rem .9rem 0;
+  padding: .55rem .8rem;
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .74rem; color: var(--text-mid);
+}
+.startbox-lbl { flex: 1; line-height: 1.4; }
+.startbox-lbl strong { color: var(--green-dark); }
+.startbox-edit {
+  border: 1px solid var(--green-light);
+  background: var(--green-light);
+  color: var(--green-dark);
+  border-radius: var(--radius-sm);
+  font-family: var(--fb); font-size: .72rem;
+  padding: .4rem .7rem; cursor: pointer;
+  min-height: 36px; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Block message (data fuori percorso) */
+.block-msg {
+  margin: .9rem; padding: 1.2rem 1rem;
+  background: var(--amber-light);
+  border: 1.5px solid var(--amber);
+  border-radius: var(--radius);
+  text-align: center; font-size: .85rem; line-height: 1.6;
+  color: #4A2800;
+}
+
+/* Overlay generico (setup/modifica data inizio) */
+.ov {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9998;
+}
+.ov-card {
+  background: #fff; border-radius: 18px;
+  padding: 2rem 1.5rem; max-width: 340px; width: 90%;
+  text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,.25);
+}
+.ov-card h2 { font-family: var(--fh); font-weight: normal; color: var(--green-dark); margin-bottom: .5rem; font-size: 1.2rem; }
+.ov-card p  { font-size: .82rem; color: var(--text-mid); line-height: 1.5; margin-bottom: 1.1rem; }
+.ov-input {
+  width: 100%; padding: .75rem;
+  border: 2px solid var(--border); border-radius: 11px;
+  font-size: 1rem; outline: none; margin-bottom: .75rem;
+  font-family: inherit; color: var(--text);
+}
+.ov-btn {
+  width: 100%; padding: .75rem;
+  background: var(--green); color: #fff;
+  border: none; border-radius: 11px;
+  font-size: 1rem; cursor: pointer; font-family: inherit;
+}
+.ov-btn-2 {
+  width: 100%; padding: .6rem;
+  background: transparent; color: var(--text-mid);
+  border: none; font-size: .8rem; cursor: pointer;
+  font-family: inherit; margin-top: .5rem;
+}
+.ov-err { display: none; color: var(--red); font-size: .8rem; margin-top: .5rem; }
 </style>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
 <!-- ============================================================
      AUTH OVERLAY
      ============================================================ -->
-<div id="authOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,.55);
-     display:flex;align-items:center;justify-content:center;z-index:9999">
-  <div style="background:#fff;border-radius:18px;padding:2rem 1.5rem;
-              max-width:320px;width:90%;text-align:center;
-              box-shadow:0 8px 32px rgba(0,0,0,.25)">
+<div id="authOverlay" class="ov" style="z-index:9999">
+  <div class="ov-card">
     <div style="font-size:2.2rem;margin-bottom:.4rem">🐾</div>
-    <h2 style="font-family:Georgia,serif;font-weight:normal;color:#345A3E;
-               margin-bottom:1.2rem;font-size:1.2rem">Dieta Mirto</h2>
-    <input type="password" id="pwdInput" placeholder="Password"
-      style="width:100%;padding:.75rem;border:2px solid #E2D8C8;
-             border-radius:11px;font-size:1rem;outline:none;
-             margin-bottom:.75rem;font-family:inherit"
+    <h2>Dieta Mirto</h2>
+    <input type="password" id="pwdInput" class="ov-input" placeholder="Password"
       onkeydown="if(event.key==='Enter')checkPwd()">
-    <button onclick="checkPwd()"
-      style="width:100%;padding:.75rem;background:#4A7A55;color:#fff;
-             border:none;border-radius:11px;font-size:1rem;cursor:pointer;
-             font-family:inherit">Entra</button>
-    <div id="pwdErr" style="display:none;color:#B94040;font-size:.82rem;
-                            margin-top:.6rem">Password errata. Riprova.</div>
+    <button class="ov-btn" onclick="checkPwd()">Entra</button>
+    <div id="pwdErr" class="ov-err">Password errata. Riprova.</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     START-DATE OVERLAY (setup / modifica)
+     ============================================================ -->
+<div id="startOverlay" class="ov" style="display:none">
+  <div class="ov-card">
+    <div style="font-size:2.2rem;margin-bottom:.4rem">🗓️</div>
+    <h2>Giorno 1 del percorso</h2>
+    <p>Definisci la data di inizio del percorso nutrizionale. Da qui il tool calcola la fase di ogni giorno.</p>
+    <input type="date" id="startInput" class="ov-input">
+    <button class="ov-btn" onclick="confirmStart()">Conferma</button>
+    <button class="ov-btn-2" id="startCancel" onclick="cancelStart()" style="display:none">Annulla</button>
+    <div id="startErr" class="ov-err">Seleziona una data valida.</div>
   </div>
 </div>
 
@@ -349,12 +452,12 @@ body {
     <span class="hdr-paw">🐾</span>
     <div>
       <div class="hdr-title">Dieta Mirto</div>
-      <div class="hdr-sub">Corgi · 4 mesi · BARF · 280 gr/die · 4 pasti<br>Dott.ssa A. Fabbri · 16/05/2026</div>
+      <div class="hdr-sub">Corgi · 5 mesi · Dieta Mista · 4 pasti<br>Dott.ssa A. Fabbri · 30/06/2026</div>
     </div>
   </div>
   <nav class="tab-bar">
-    <button class="tab-btn on" onclick="switchTab('piano',this)">📅 Piano settimanale</button>
-    <button class="tab-btn"    onclick="switchTab('info',this)">ℹ️ Alternative &amp; Info</button>
+    <button class="tab-btn on" onclick="switchTab('piano',this)">📅 Piano giornaliero</button>
+    <button class="tab-btn"    onclick="switchTab('info',this)">ℹ️ Info &amp; Timeline</button>
   </nav>
 </header>
 
@@ -363,9 +466,9 @@ body {
      ============================================================ -->
 <div id="pg-piano" class="page on">
 
-  <div class="day-strip-wrap">
-    <div class="day-strip" id="dayStrip"></div>
-  </div>
+  <div class="startbox" id="startBox"></div>
+
+  <div class="date-nav" id="dateNav"></div>
 
   <div class="day-wrap" id="dayWrap"></div>
 
@@ -376,121 +479,49 @@ body {
      ============================================================ -->
 <div id="pg-info" class="page">
 <div class="info-wrap">
-
-  <!-- SOSTITUZIONE OP -->
-  <div class="acc" id="a-op">
-    <div class="acc-head" onclick="tog('a-op')">
-      <span class="acc-ico">🦴</span>
-      <h3>Sostituzione OP (Ossa Polpose)</h3>
+  <!-- TIMELINE PERCORSO -->
+  <div class="acc open" id="a-time">
+    <div class="acc-head" onclick="tog('a-time')">
+      <span class="acc-ico">🗓️</span>
+      <h3>Timeline del percorso (Giorno 1 → 50)</h3>
       <span class="acc-arr">▼</span>
     </div>
     <div class="acc-body">
-      <p class="it"><span class="il">Sostituzione TOTALE</span> — 130 gr OP non disponibili:</p>
       <table class="itbl">
-        <tr><th>Sostituisci</th><th>Con</th></tr>
-        <tr>
-          <td>130 gr OP</td>
-          <td>3 gr farina d'ossa (1 cucchiaino da caffè)<br>+ CSO portata a <strong>200 gr</strong> totali nel giorno</td>
-        </tr>
+        <tr><th>Giorni</th><th>Alimentazione</th><th>Gastroprotettore</th><th>Fermento</th></tr>
+        <tr><td><strong>1–2</strong></td><td>Reico 150 g ×2 + carne 250 g. Niente olio/verdura/V-Integra</td><td>Antepsin matt+sera</td><td>CDS-22</td></tr>
+        <tr><td><strong>3–4</strong></td><td>+ olio cocco; Reico → 200 g/die</td><td>Antepsin</td><td>CDS-22</td></tr>
+        <tr><td><strong>5</strong></td><td>+ verdura 40 g</td><td>Antepsin</td><td>CDS-22</td></tr>
+        <tr><td><strong>6–10</strong></td><td>+ V-Integra ½ misurino</td><td>Antepsin (fino g.10)</td><td>CDS-22 (fino g.10)</td></tr>
+        <tr><td><strong>11–13</strong></td><td>Regime pieno (V-Integra 1 misurino)</td><td>Gastrotaxil (sera)</td><td>Enterelle Plus</td></tr>
+        <tr><td><strong>14–30</strong></td><td>+ REICO Probio+ 2 g</td><td>Gastrotaxil (fino g.30)</td><td>Enterelle + Probio+</td></tr>
+        <tr><td><strong>31–50</strong></td><td>Regime pieno</td><td>—</td><td>Bifiselle + Probio+</td></tr>
+        <tr><td><strong>51+</strong></td><td>Mantenimento</td><td>—</td><td>Probio+ (fine confezione)</td></tr>
       </table>
-      <p class="i-note i-green">CSO totale 200 gr: distribuire nei pasti di mezzogiorno, pomeriggio e sera.</p>
-
-      <p class="it" style="margin-top:.75rem"><span class="il">Sostituzione PARZIALE</span> — per ogni 100 gr di colli di pollo mancanti:</p>
-      <table class="itbl">
-        <tr><th>Sostituisci</th><th>Con</th></tr>
-        <tr>
-          <td>100 gr colli di pollo</td>
-          <td>2,30 gr farina d'ossa + CSO <strong>+80 gr</strong> aggiuntivi</td>
-        </tr>
-      </table>
-
-      <p class="it" style="margin-top:.75rem"><span class="il">Esempi pratici</span> (target OP 130 gr/giorno):</p>
-      <table class="itbl">
-        <tr><th>OP disponibili</th><th>Farina d'ossa</th><th>CSO totale giorno</th></tr>
-        <tr><td>130 gr (tutto)</td><td>0</td><td>70 gr</td></tr>
-        <tr><td>30 gr (100 mancanti)</td><td>2,30 gr</td><td>150 gr</td></tr>
-        <tr><td>0 gr (tutto mancante)</td><td>3,00 gr</td><td>200 gr</td></tr>
-      </table>
-      <p class="i-note i-amber">La farina d'ossa va nel pasto del mattino al posto delle OP. La CSO aggiuntiva si distribuisce nei pasti successivi (mezzogiorno, pomeriggio, sera).</p>
+      <p class="i-note i-green"><strong>Omegor-Krill</strong>: 2 capsule ogni mattina, dal Giorno 1 fino al controllo nutrizionale.</p>
+      <p class="i-note i-amber">Il tool calcola in automatico la fase del giorno selezionato a partire dalla data di inizio. Le frecce permettono di rivedere i giorni passati e le spunte già date.</p>
     </div>
   </div>
 
-  <!-- VARIETÀ OP -->
-  <div class="acc" id="a-vop">
-    <div class="acc-head" onclick="tog('a-vop')">
-      <span class="acc-ico">🍗</span>
-      <h3>Varietà OP consentite</h3>
+  <!-- REGIME GIORNALIERO -->
+  <div class="acc" id="a-reg">
+    <div class="acc-head" onclick="tog('a-reg')">
+      <span class="acc-ico">🍽️</span>
+      <h3>Dieta a regime — giorno tipo</h3>
       <span class="acc-arr">▼</span>
     </div>
     <div class="acc-body">
-      <p class="it">Il piano base usa solo colli di pollo (910 gr/settimana). È possibile sostituire fino a <strong>210 gr/settimana</strong> con:</p>
+      <p class="it">Pesi a crudo. Totali giornalieri a regime:</p>
       <table class="itbl" style="margin-top:.5rem">
-        <tr><th>Alternativa OP</th></tr>
-        <tr><td>Ali di pollo</td></tr>
-        <tr><td>Coscia di pollo</td></tr>
-        <tr><td>Carcassa di coniglio</td></tr>
+        <tr><th>Ingrediente</th><th>Quantità/die</th></tr>
+        <tr><td>Umido REICO</td><td>200 gr (100+100)</td></tr>
+        <tr><td>Carne tacchino/pollo cotta</td><td>250 gr (125+125)</td></tr>
+        <tr><td>Verdura lessata e frullata</td><td>40 gr (finocchio/carote/zucca)</td></tr>
+        <tr><td>Olio di cocco deodorato</td><td>8 gr (1 cucchiaio)</td></tr>
+        <tr><td>V-Integra Cane Cucciolo</td><td>5 gr (1 misurino)</td></tr>
       </table>
-      <p class="i-note i-green">Minimo garantito: <strong>700 gr/settimana di colli di pollo</strong> sempre rispettato.</p>
-    </div>
-  </div>
-
-  <!-- VERDURA -->
-  <div class="acc" id="a-verd">
-    <div class="acc-head" onclick="tog('a-verd')">
-      <span class="acc-ico">🥦</span>
-      <h3>Verdura — Preparazione &amp; Varietà</h3>
-      <span class="acc-arr">▼</span>
-    </div>
-    <div class="acc-body">
-      <p class="it"><span class="il">Giorni con verdura:</span> Lunedì, Mercoledì, Venerdì, Domenica (4 giorni/settimana · 30 gr/giorno).</p>
-      <p class="it"><span class="il">Preparazione:</span> Lessata o cotta a vapore, poi frullata.</p>
-      <table class="itbl" style="margin:.5rem 0">
-        <tr><th>Verdura consentita</th></tr>
-        <tr><td>Carote</td></tr>
-        <tr><td>Zucca</td></tr>
-        <tr><td>Finocchio</td></tr>
-      </table>
-      <p class="i-note i-amber">⚠️ Non mescolare mai la verdura (cotta) con CSO/OP (crudi) né con la trippa, fino al momento di servire.</p>
-      <p class="i-note i-green">Preparabile in anticipo per 2–3 giorni. Conservare in frigo in contenitore ermetico separato da carne/ossa.</p>
-    </div>
-  </div>
-
-  <!-- SCONGELAMENTO -->
-  <div class="acc" id="a-scong">
-    <div class="acc-head" onclick="tog('a-scong')">
-      <span class="acc-ico">🧊</span>
-      <h3>Guida allo scongelamento</h3>
-      <span class="acc-arr">▼</span>
-    </div>
-    <div class="acc-body">
-      <table class="itbl">
-        <tr><th>Quando</th><th>Cosa</th><th>Note</th></tr>
-        <tr>
-          <td><strong>Domenica sera</strong></td>
-          <td>CSO Block 1 (250 gr)</td>
-          <td>Copre lun/mar/mer (70 gr/giorno). ~40 gr residui in frigo per giovedì</td>
-        </tr>
-        <tr>
-          <td><strong>Mercoledì sera</strong></td>
-          <td>CSO Block 2 (250 gr)</td>
-          <td>Giovedì usa 30 gr Block 2 + 40 gr Block 1 = 70 gr. Poi ven/sab/dom 70 gr/die. ~10 gr surplus → ricongela</td>
-        </tr>
-        <tr>
-          <td><strong>Ogni sera</strong></td>
-          <td>Trippa verde (30 gr)</td>
-          <td>Scongela la porzione del giorno successivo in frigo la sera precedente</td>
-        </tr>
-        <tr>
-          <td><strong>Mercoledì mattina</strong></td>
-          <td>Cuore (porzione 100 gr)</td>
-          <td>Apri porzione 100 gr al mattino. Usa 50 gr a mezzogiorno. Conserva 50 gr in ermetico in frigo → giovedì a mezzogiorno. Consumare entro 24 h</td>
-        </tr>
-        <tr>
-          <td><strong>Giorno stesso</strong></td>
-          <td>Fegato / Milza (sacchetto 50 gr)</td>
-          <td>Apri il sacchetto il giorno stesso dell'uso</td>
-        </tr>
-      </table>
+      <p class="i-note i-amber">La carne va <strong>cotta</strong> (scottata o stufata in padella antiaderente con 1 dito d'acqua, coperchio, 3–4 min) + 1 pizzico di sale in cottura. <strong>Niente ossa.</strong></p>
+      <p class="i-note i-green">Olio e V-Integra vanno aggiunti a crudo, al momento di servire il pasto.</p>
     </div>
   </div>
 
@@ -498,82 +529,95 @@ body {
   <div class="acc" id="a-int">
     <div class="acc-head" onclick="tog('a-int')">
       <span class="acc-ico">💊</span>
-      <h3>Integratori — Scheda completa</h3>
+      <h3>Integratori &amp; farmaci — scheda</h3>
       <span class="acc-arr">▼</span>
     </div>
     <div class="acc-body">
       <table class="itbl">
-        <tr><th>Integratore</th><th>Dose</th><th>Quando</th><th>Durata</th></tr>
-        <tr>
-          <td>Normalia Extra</td>
-          <td>½ compressa</td>
-          <td>Mezzogiorno + Sera (con il cibo)</td>
-          <td>Fino a 60 giorni</td>
-        </tr>
-        <tr>
-          <td>Omega-3 1000 mg<br><small>(Omegor-Vitality / Duomega)</small></td>
-          <td>1 capsula</td>
-          <td>Mezzogiorno (con il cibo)</td>
-          <td>Fino a controllo nutrizionale</td>
-        </tr>
-        <tr>
-          <td>Olio di cocco</td>
-          <td>8 gr totali<br><small>(2 cucchiaini da tè)</small></td>
-          <td>4 gr pomeriggio + 4 gr sera</td>
-          <td>Giornaliero</td>
-        </tr>
-        <tr>
-          <td>CDS-22 (450 miliardi)</td>
-          <td>½ bustina</td>
-          <td>Mezzogiorno (con il cibo)</td>
-          <td>10 giorni/mese consecutivi</td>
-        </tr>
+        <tr><th>Prodotto</th><th>Dose</th><th>Quando</th><th>Durata</th></tr>
+        <tr><td>Antepsin</td><td>1 gr</td><td>Mattina e sera</td><td>10 giorni (g.1–10)</td></tr>
+        <tr><td>Gastrotaxil</td><td>2 ml</td><td>Sera, prima di dormire</td><td>20 giorni (g.11–30)</td></tr>
+        <tr><td>CDS-22 (450 mld)</td><td>1 bustina</td><td>Mezzogiorno, con l'alimento</td><td>10 giorni (g.1–10)</td></tr>
+        <tr><td>Enterelle Plus</td><td>1 capsula</td><td>Mezzogiorno</td><td>≥20 giorni (g.11–30)</td></tr>
+        <tr><td>Bifiselle</td><td>1 capsula</td><td>Mezzogiorno</td><td>≥20 giorni (g.31–50)</td></tr>
+        <tr><td>REICO Probio+</td><td>2 gr</td><td>Mezzogiorno</td><td>Da g.14, fino a fine confezione</td></tr>
+        <tr><td>Omegor-Krill</td><td>2 capsule</td><td>Pasto del mattino</td><td>Fino al controllo</td></tr>
       </table>
-      <p class="i-note i-red">⚠️ <strong>CDS-22:</strong> Non è un integratore continuativo quotidiano. Somministrare ½ bustina ogni giorno per 10 giorni consecutivi al mese. Nei restanti giorni non somministrare.</p>
-      <p class="i-note i-amber">ℹ️ <strong>Nota Normalia Extra:</strong> Il piano nutrizionale prescriveva la dose a mattina e sera. Poiché il pasto del mattino è riservato alle sole OP, la dose mattutina è stata spostata a mezzogiorno. Comunicare alla Dott.ssa Fabbri al prossimo controllo per conferma.</p>
+      <p class="i-note i-blue">I fermenti e i probiotici sono posizionati a <strong>mezzogiorno</strong> (mai la sera): la sera va tenuta leggera per il riposo notturno, considerati gli episodi di vomito gastrico notturno. Il sucralfato (Antepsin) lega altre sostanze, quindi mezzogiorno è la finestra "pulita" tra le due dosi.</p>
+      <p class="i-note i-amber">⚠️ Il posizionamento di fermenti/probiotici è un'ottimizzazione di digeribilità, non una prescrizione. Confermare il timing dei farmaci (Antepsin, Gastrotaxil) con la Dott.ssa Fabbri.</p>
     </div>
   </div>
 
-  <!-- NOTE NUTRIZIONISTA -->
-  <div class="acc" id="a-note">
-    <div class="acc-head" onclick="tog('a-note')">
-      <span class="acc-ico">📊</span>
-      <h3>Note nutrizionista — Discrepanza mensile</h3>
+  <!-- VERDURA -->
+  <div class="acc" id="a-verd">
+    <div class="acc-head" onclick="tog('a-verd')">
+      <span class="acc-ico">🥦</span>
+      <h3>Verdura — preparazione</h3>
       <span class="acc-arr">▼</span>
     </div>
     <div class="acc-body">
-      <p class="it">I target mensili del piano (Fegato 660 gr, Cuore 500 gr, Milza 500 gr) non sono completamente raggiungibili con i vincoli di porzionamento e il limite settimanale di 100 gr per il fegato.</p>
-      <p class="it" style="margin-top:.5rem">Il piano settimanale ottimizzato produce: Fegato ~400 gr/mese, Cuore ~400 gr/mese, Milza ~600 gr/mese. Il totale mensile degli organi (1400 gr) è in linea con il target di 1500 gr/mese.</p>
-
-      <p class="it" style="margin-top:.75rem"><span class="il">Distribuzione organi settimanale:</span></p>
-      <table class="itbl">
-        <tr><th>Organo</th><th>Target/sett.</th><th>Pianificato</th><th>Delta</th></tr>
-        <tr><td>Fegato</td><td>max 100 gr</td><td>100 gr (2×50)</td><td>0</td></tr>
-        <tr><td>Cuore</td><td>~125 gr</td><td>100 gr (2×50)</td><td>−25 gr</td></tr>
-        <tr><td>Milza</td><td>~125 gr</td><td>150 gr (3×50)</td><td>+25 gr</td></tr>
-        <tr><td><strong>Totale organi</strong></td><td><strong>350 gr</strong></td><td><strong>350 gr</strong></td><td><strong>0</strong></td></tr>
+      <p class="it"><span class="il">Quantità:</span> 40 gr/die a regime (da g.5).</p>
+      <p class="it"><span class="il">Preparazione:</span> bollita o cotta al vapore, poi frullata.</p>
+      <table class="itbl" style="margin:.5rem 0">
+        <tr><th>Verdura consentita</th></tr>
+        <tr><td>Carote</td></tr>
+        <tr><td>Finocchio</td></tr>
+        <tr><td>Zucca</td></tr>
       </table>
-      <p class="i-note i-blue">La milza compensa parzialmente il cuore. Nessun impatto clinico atteso secondo il piano. Per allinearsi ai target individuali, contattare la Dott.ssa Fabbri al prossimo controllo.</p>
+      <p class="i-note i-green">Preparabile in anticipo. Conservare in frigo in contenitore ermetico.</p>
+    </div>
+  </div>
+
+  <!-- MASTICATIVI -->
+  <div class="acc" id="a-mast">
+    <div class="acc-head" onclick="tog('a-mast')">
+      <span class="acc-ico">🦴</span>
+      <h3>Masticativi consigliati</h3>
+      <span class="acc-arr">▼</span>
+    </div>
+    <div class="acc-body">
+      <table class="itbl">
+        <tr><th>Masticativo</th><th>Frequenza</th></tr>
+        <tr><td>Intestino essiccato di maiale</td><td>1 pezzo, tutti i giorni</td></tr>
+        <tr><td>Zampe di gallina · orecchie di coniglio (con/senza pelo)</td><td>1 pezzo, 3–4 volte/settimana</td></tr>
+      </table>
+      <p class="i-note i-amber">⚠️ Dopo la gastrotomia da ingestione di osso, evitare ossa e bocconi rischiosi. Sorvegliare sempre durante la masticazione.</p>
+    </div>
+  </div>
+
+  <!-- KONG -->
+  <div class="acc" id="a-kong">
+    <div class="acc-head" onclick="tog('a-kong')">
+      <span class="acc-ico">🧊</span>
+      <h3>Ricetta KONG</h3>
+      <span class="acc-arr">▼</span>
+    </div>
+    <div class="acc-body">
+      <p class="it">Da proporre fresco o congelato (da leccare piano piano):</p>
+      <table class="itbl" style="margin-top:.5rem">
+        <tr><th>Componente</th><th>Quantità</th></tr>
+        <tr><td>Carne o snack (petto d'anatra / essiccato bovino-pollo)</td><td>20–30 gr carne · oppure 10 gr snack</td></tr>
+        <tr><td>Verdura lessata frullata o frutta frullata (banana, mela, pera)</td><td>20 gr</td></tr>
+      </table>
+      <p class="i-note i-green">È possibile aggiungere ½ cucchiaino di miele o di burro di arachidi.</p>
     </div>
   </div>
 
   <p style="text-align:center;font-size:.72rem;color:var(--text-dim);padding:.25rem 0 .5rem">
-    Piano nutrizionale: Dott.ssa Arianna Fabbri · 16/05/2026<br>
+    Piano nutrizionale: Dott.ssa Arianna Fabbri · 30/06/2026<br>
     <em>Non sostituisce il parere del medico veterinario nutrizionista</em>
   </p>
-
 </div>
 </div>
 
 <!-- FOOTER -->
 <footer class="footer">
-  Versione: 1.1 &nbsp;|&nbsp; Aggiornato: 18/05/2026 &nbsp;|&nbsp; Autore: Matteo Passerini
+  Versione: 2.0 &nbsp;|&nbsp; Aggiornato: 30/06/2026 &nbsp;|&nbsp; Autore: Matteo Passerini
 </footer>
 
 <script>
 /* ============================================================
    FIREBASE CONFIG
-   Per cambiare la password: modifica solo APP_PASSWORD qui sotto
    ============================================================ */
 const FIREBASE_CONFIG = {
   apiKey:            'AIzaSyAwgDe9-RRaKHAMh75TQK3gPUiCZv1kZuE',
@@ -597,6 +641,24 @@ const db        = firebase.database();
 const STATE_REF = db.ref('mirto/state');
 
 /* ============================================================
+   STATO APPLICAZIONE
+   - startDate : 'YYYY-MM-DD' (giorno 1 del percorso), da Firebase
+   - selDate   : Date selezionata (navigazione frecce)
+   - checked   : checked['YYYY-MM-DD'][mealKey][itemIdx] = boolean
+   ============================================================ */
+let startDate = null;
+let selDate   = new Date();
+const checked = {};
+
+const MEAL_ORDER = ['mattina', 'mezzogiorno', 'pomeriggio', 'sera'];
+const GIORNI = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+const GIORNI_SH = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+const MESI = ['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic'];
+
+/* Durata totale percorso "a contatori" (catena fermenti) */
+const PERCORSO_GG = 50;
+
+/* ============================================================
    AUTH
    ============================================================ */
 function checkPwd() {
@@ -613,425 +675,270 @@ function checkPwd() {
 }
 
 /* ============================================================
-   RESET SETTIMANALE
-   Calcola il timestamp del lunedì 00:00:00 della settimana corrente.
-   Se lastReset è precedente → la settimana è cambiata → azzera tutto.
+   UTILITY DATE
    ============================================================ */
-function getMondayTs() {
-  const d   = new Date();
-  const day = d.getDay();
-  const diff = (day === 0) ? -6 : 1 - day;
-  d.setDate(d.getDate() + diff);
-  d.setHours(0, 0, 0, 0);
-  return d.getTime();
+function midnight(d) { const x = new Date(d); x.setHours(0,0,0,0); return x; }
+function fmtKey(d)   { return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2); }
+function parseKey(s) { const p = s.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
+function daysBetween(a, b) { return Math.round((midnight(b) - midnight(a)) / 86400000); }
+function fmtDisplay(d) { return GIORNI_SH[d.getDay()] + ' ' + d.getDate() + ' ' + MESI[d.getMonth()] + ' ' + d.getFullYear(); }
+
+/* Numero giorno del percorso per la data selezionata (1-based) */
+function dayNumber(d) { return daysBetween(parseKey(startDate), d) + 1; }
+
+/* ============================================================
+   COSTRUZIONE PIANO GIORNALIERO IN BASE ALLA FASE (giorno N)
+   Cibo identico ogni giorno; cambiano integratori e introduzione graduale.
+   ============================================================ */
+function phaseLabel(N) {
+  if (N <= 2)  return 'Introduzione · base';
+  if (N <= 4)  return 'Introduzione · +olio';
+  if (N <= 5)  return 'Introduzione · +verdura';
+  if (N <= 10) return 'Introduzione · +V-Integra';
+  if (N <= 30) return 'Regime · Enterelle + Gastrotaxil';
+  if (N <= 50) return 'Regime · Bifiselle';
+  return 'Mantenimento';
+}
+
+function buildDay(N) {
+  /* Alimentazione */
+  const reicoIntro = (N <= 2);                 // g1-2: Reico 150+150
+  const reicoQ     = reicoIntro ? '150 gr' : '100 gr';
+  const hasOlio    = (N >= 3);                 // g3+: olio di cocco
+  const hasVerdura = (N >= 5);                 // g5+: verdura
+  const hasVintegra= (N >= 6);                 // g6+: V-Integra
+  const vintegraQ  = (N >= 11) ? '1 misurino (5 gr)' : '½ misurino';
+
+  /* Gastroprotezione */
+  const antepsin    = (N >= 1 && N <= 10);     // g1-10 mattina+sera
+  const gastrotaxil = (N >= 11 && N <= 30);    // g11-30 sera
+
+  /* Fermenti (mezzogiorno) — catena */
+  let fermento = null;
+  if (N <= 10)      fermento = { n:'CDS-22 (450 mld)', q:'1 bustina', note:'Mescolare con l\u2019alimento' };
+  else if (N <= 30) fermento = { n:'Enterelle Plus',   q:'1 capsula' };
+  else if (N <= 50) fermento = { n:'Bifiselle',        q:'1 capsula' };
+  const probio = (N >= 14);                    // Probio+ da g14
+
+  /* MATTINA */
+  const mattina = { ico:'🌅', lbl:'Mattina', items:[] };
+  mattina.items.push({ n:'Carne tacchino/pollo cotta', q:'125 gr', note:'Scottata o stufata, pizzico di sale' });
+  mattina.items.push({ n:'Omegor-Krill', q:'2 capsule' });
+  if (antepsin) mattina.items.push({ n:'Antepsin', q:'1 gr', note:'Idealmente lontano dal pasto — confermare con la vet', opt:true });
+
+  /* MEZZOGIORNO */
+  const mezzogiorno = { ico:'☀️', lbl:'Mezzogiorno', items:[] };
+  mezzogiorno.items.push({ n:'Umido REICO', q:reicoQ });
+  if (hasVerdura)  mezzogiorno.items.push({ n:'Verdura lessata e frullata', q:'40 gr', note:'Finocchio, carote o zucca' });
+  if (hasVintegra) mezzogiorno.items.push({ n:'V-Integra Cane Cucciolo', q:vintegraQ });
+  if (fermento)    mezzogiorno.items.push(fermento);
+  if (probio)      mezzogiorno.items.push({ n:'REICO Probio+', q:'2 gr' });
+
+  /* POMERIGGIO */
+  const pomeriggio = { ico:'🌤️', lbl:'Pomeriggio', items:[] };
+  pomeriggio.items.push({ n:'Carne tacchino/pollo cotta', q:'125 gr', note:'Scottata o stufata, pizzico di sale' });
+  if (hasOlio) pomeriggio.items.push({ n:'Olio di cocco deodorato', q:'8 gr', note:'1 cucchiaio, a crudo al momento di servire' });
+
+  /* SERA */
+  const sera = { ico:'🌙', lbl:'Sera', items:[] };
+  sera.items.push({ n:'Umido REICO', q:reicoQ });
+  if (antepsin)    sera.items.push({ n:'Antepsin', q:'1 gr', note:'Idealmente lontano dal pasto — confermare con la vet', opt:true });
+  if (gastrotaxil) sera.items.push({ n:'Gastrotaxil', q:'2 ml', note:'La sera, prima di dormire', opt:true });
+
+  return { mattina:mattina, mezzogiorno:mezzogiorno, pomeriggio:pomeriggio, sera:sera };
 }
 
 /* ============================================================
-   LOAD STATE DA FIREBASE
+   FIREBASE — LOAD / SAVE (stato per data reale, nessun reset)
    ============================================================ */
 async function loadState() {
-  const snap          = await STATE_REF.once('value');
-  const data          = snap.val() || {};
-  const currentMonday = getMondayTs();
-
-  if ((data.lastReset || 0) < currentMonday) {
-    await STATE_REF.set({ lastReset: currentMonday, checked: null });
-    return;
-  }
-
+  const snap = await STATE_REF.once('value');
+  const data = snap.val() || {};
+  startDate = data.startDate || null;
   if (data.checked) {
-    for (const d in data.checked) {
-      if (!checked[d]) continue;
-      for (const mk in data.checked[d]) {
-        if (checked[d][mk] !== undefined) {
-          checked[d][mk] = data.checked[d][mk];
-        }
-      }
-    }
+    for (const dk in data.checked) checked[dk] = data.checked[dk];
   }
 }
 
-/* ============================================================
-   SAVE STATE SU FIREBASE
-   ============================================================ */
 function saveState() {
-  STATE_REF.update({ checked: checked }).catch(function(err) {
+  const dk = fmtKey(selDate);
+  STATE_REF.child('checked').child(dk).set(checked[dk] || null).catch(function(err) {
     console.warn('Errore salvataggio Firebase:', err);
   });
 }
 
+function saveStartDate(val) {
+  startDate = val;
+  STATE_REF.child('startDate').set(val).catch(function(err) {
+    console.warn('Errore salvataggio data inizio:', err);
+  });
+}
+
 /* ============================================================
-   INIT ASINCRONO (chiamato dopo auth)
+   SETUP / MODIFICA DATA INIZIO
    ============================================================ */
-async function initApp() {
-  await loadState();
-  renderStrip();
+function showStartSetup() {
+  const ov = document.getElementById('startOverlay');
+  document.getElementById('startInput').value = startDate || fmtKey(new Date());
+  document.getElementById('startErr').style.display = 'none';
+  // se non è ancora impostata, il secondo bottone (annulla) non serve
+  document.getElementById('startCancel').style.display = startDate ? 'block' : 'none';
+  ov.style.display = 'flex';
+}
+
+function confirmStart() {
+  const val = document.getElementById('startInput').value;
+  if (!val) { document.getElementById('startErr').style.display = 'block'; return; }
+  saveStartDate(val);
+  document.getElementById('startOverlay').style.display = 'none';
+  selDate = new Date();
+  renderAll();
+}
+
+function cancelStart() {
+  document.getElementById('startOverlay').style.display = 'none';
+}
+
+/* ============================================================
+   NAVIGAZIONE FRECCE
+   ◀ si ferma al Giorno 1 (startDate) · ▶ si ferma a oggi
+   ============================================================ */
+function canPrev() { return daysBetween(parseKey(startDate), selDate) > 0; }
+function canNext() { return daysBetween(selDate, new Date()) > 0; }
+
+function shiftDay(n) {
+  if (n < 0 && !canPrev()) return;
+  if (n > 0 && !canNext()) return;
+  const d = new Date(selDate);
+  d.setDate(d.getDate() + n);
+  selDate = d;
+  renderAll();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderAll() {
+  renderStartBox();
+  renderDateNav();
   renderDay();
 }
 
-/* ============================================================
-   DATI — fedeli al documento piano_dieta_mirto_settimanale_v3.md
-   Fonte: Consulenza Dott.ssa Arianna Fabbri, 16/05/2026
-   ============================================================ */
-
-const EMOJI_G = ['🌅','🍂','🌿','🍁','🌻','🐾','☀️'];
-
-/*
-  Struttura item: { n: nome, q: quantità, note?: stringa, opt?: true }
-  opt = true → CDS-22 (condizionale, ciclo mensile)
-*/
-const PIANI = [
-  // ─── 0: LUNEDÌ — Template B — Fegato — Verdura ✓ ───────────────────────────
-  {
-    label:'Lunedì', template:'B', organo:'Fegato', veg:true,
-    alerts:[
-      { t:'info', title:'🧊 CSO Block 1',
-        txt:'Assicurati che il Block 1 CSO (250 gr) sia stato scongelato domenica sera. Copre lun/mar/mer.' }
-    ],
-    pasti:{
-      mattina:{ico:'🌅',lbl:'Mattina',items:[
-        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
-      ]},
-      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
-        {n:'Fegato', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
-        {n:'CSO (Block 1)', q:'35 gr'},
-        {n:'Verdura lessata/frullata', q:'30 gr', note:'Mescola solo al momento di servire'},
-        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
-        {n:'Normalia Extra', q:'½ compressa'},
-        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
-      ]},
-      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
-        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
-        {n:'Olio di cocco', q:'4 gr'}
-      ]},
-      sera:{ico:'🌙',lbl:'Sera',items:[
-        {n:'CSO (Block 1)', q:'35 gr'},
-        {n:'Olio di cocco', q:'4 gr'},
-        {n:'Normalia Extra', q:'½ compressa'}
-      ]}
-    }
-  },
-
-  // ─── 1: MARTEDÌ — Template A — Milza — No verdura ──────────────────────────
-  {
-    label:'Martedì', template:'A', organo:'Milza', veg:false,
-    alerts:[],
-    pasti:{
-      mattina:{ico:'🌅',lbl:'Mattina',items:[
-        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
-      ]},
-      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
-        {n:'Milza', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
-        {n:'CSO (Block 1)', q:'35 gr'},
-        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
-        {n:'Normalia Extra', q:'½ compressa'},
-        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
-      ]},
-      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
-        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
-        {n:'Olio di cocco', q:'4 gr'}
-      ]},
-      sera:{ico:'🌙',lbl:'Sera',items:[
-        {n:'CSO (Block 1)', q:'35 gr'},
-        {n:'Olio di cocco', q:'4 gr'},
-        {n:'Normalia Extra', q:'½ compressa'}
-      ]}
-    }
-  },
-
-  // ─── 2: MERCOLEDÌ — Template B — Cuore — Verdura ✓ ─────────────────────────
-  {
-    label:'Mercoledì', template:'B', organo:'Cuore', veg:true,
-    alerts:[
-      { t:'warn', title:'🫀 Cuore — Azione mattina',
-        txt:'Apri porzione da 100 gr al mattino. Usa 50 gr a mezzogiorno. Conserva i restanti 50 gr in contenitore ermetico in frigo → da usare giovedì a mezzogiorno. Consumare entro 24 ore.' },
-      { t:'info', title:'🧊 Scongelamento sera',
-        txt:'Stasera: scongela CSO Block 2 (250 gr) in frigo per giovedì.' }
-    ],
-    pasti:{
-      mattina:{ico:'🌅',lbl:'Mattina',items:[
-        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
-      ]},
-      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
-        {n:'Cuore', q:'50 gr', note:'Apri porzione 100 gr al mattino; usa 50 gr ora, conserva 50 gr in frigo per giovedì'},
-        {n:'CSO (Block 1)', q:'35 gr'},
-        {n:'Verdura lessata/frullata', q:'30 gr', note:'Mescola solo al momento di servire'},
-        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
-        {n:'Normalia Extra', q:'½ compressa'},
-        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
-      ]},
-      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
-        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
-        {n:'Olio di cocco', q:'4 gr'}
-      ]},
-      sera:{ico:'🌙',lbl:'Sera',items:[
-        {n:'CSO (Block 1)', q:'35 gr'},
-        {n:'Olio di cocco', q:'4 gr'},
-        {n:'Normalia Extra', q:'½ compressa'}
-      ]}
-    }
-  },
-
-  // ─── 3: GIOVEDÌ — Template A — Cuore (frigo) — No verdura ─────────────────
-  {
-    label:'Giovedì', template:'A', organo:'Cuore', veg:false,
-    alerts:[
-      { t:'warn', title:'🫀 Cuore — Dal frigo',
-        txt:'Usa i 50 gr di cuore conservati ieri (mercoledì) in contenitore ermetico. Consumare entro 24 ore dall\'apertura.' },
-      { t:'amber', title:'🧊 CSO — Doppio blocco',
-        txt:'CSO giornaliera totale: ~40 gr residui Block 1 + 30 gr Block 2 = 70 gr. Suddividi 35 gr a mezzogiorno + 35 gr a sera.' }
-    ],
-    pasti:{
-      mattina:{ico:'🌅',lbl:'Mattina',items:[
-        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
-      ]},
-      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
-        {n:'Cuore', q:'50 gr', note:'Dalla porzione in frigo aperta mercoledì; consumare entro 24 h'},
-        {n:'CSO (40 gr Block 1 + 30 gr Block 2)', q:'35 gr', note:'Totale giorno 70 gr: usa i residui Block 1 (~40 gr) + inizio Block 2 (30 gr)'},
-        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
-        {n:'Normalia Extra', q:'½ compressa'},
-        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
-      ]},
-      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
-        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
-        {n:'Olio di cocco', q:'4 gr'}
-      ]},
-      sera:{ico:'🌙',lbl:'Sera',items:[
-        {n:'CSO (Block 2)', q:'35 gr'},
-        {n:'Olio di cocco', q:'4 gr'},
-        {n:'Normalia Extra', q:'½ compressa'}
-      ]}
-    }
-  },
-
-  // ─── 4: VENERDÌ — Template B — Fegato — Verdura ✓ ──────────────────────────
-  {
-    label:'Venerdì', template:'B', organo:'Fegato', veg:true,
-    alerts:[],
-    pasti:{
-      mattina:{ico:'🌅',lbl:'Mattina',items:[
-        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
-      ]},
-      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
-        {n:'Fegato', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
-        {n:'CSO (Block 2)', q:'35 gr'},
-        {n:'Verdura lessata/frullata', q:'30 gr', note:'Mescola solo al momento di servire'},
-        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
-        {n:'Normalia Extra', q:'½ compressa'},
-        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
-      ]},
-      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
-        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
-        {n:'Olio di cocco', q:'4 gr'}
-      ]},
-      sera:{ico:'🌙',lbl:'Sera',items:[
-        {n:'CSO (Block 2)', q:'35 gr'},
-        {n:'Olio di cocco', q:'4 gr'},
-        {n:'Normalia Extra', q:'½ compressa'}
-      ]}
-    }
-  },
-
-  // ─── 5: SABATO — Template A — Milza — No verdura ───────────────────────────
-  {
-    label:'Sabato', template:'A', organo:'Milza', veg:false,
-    alerts:[],
-    pasti:{
-      mattina:{ico:'🌅',lbl:'Mattina',items:[
-        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
-      ]},
-      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
-        {n:'Milza', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
-        {n:'CSO (Block 2)', q:'35 gr'},
-        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
-        {n:'Normalia Extra', q:'½ compressa'},
-        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
-      ]},
-      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
-        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
-        {n:'Olio di cocco', q:'4 gr'}
-      ]},
-      sera:{ico:'🌙',lbl:'Sera',items:[
-        {n:'CSO (Block 2)', q:'35 gr'},
-        {n:'Olio di cocco', q:'4 gr'},
-        {n:'Normalia Extra', q:'½ compressa'}
-      ]}
-    }
-  },
-
-  // ─── 6: DOMENICA — Template B — Milza — Verdura ✓ ──────────────────────────
-  {
-    label:'Domenica', template:'B', organo:'Milza', veg:true,
-    alerts:[
-      { t:'info', title:'🧊 Scongelamento sera',
-        txt:'Stasera: scongela CSO Block 1 (250 gr) in frigo per lunedì.' }
-    ],
-    pasti:{
-      mattina:{ico:'🌅',lbl:'Mattina',items:[
-        {n:'OP — Colli di pollo', q:'130 gr', note:'Pasto esclusivo: solo OP, nessun altro alimento'}
-      ]},
-      mezzogiorno:{ico:'☀️',lbl:'Mezzogiorno',items:[
-        {n:'Milza', q:'50 gr', note:'Apri sacchetto da 50 gr il giorno stesso'},
-        {n:'CSO (Block 2)', q:'35 gr'},
-        {n:'Verdura lessata/frullata', q:'30 gr', note:'Mescola solo al momento di servire'},
-        {n:'Omega-3 1000 mg (Omegor / Duomega)', q:'1 capsula'},
-        {n:'Normalia Extra', q:'½ compressa'},
-        {n:'CDS-22 (450 mld)', q:'½ bustina', note:'Solo se in ciclo mensile dei 10 giorni', opt:true}
-      ]},
-      pomeriggio:{ico:'🌤️',lbl:'Pomeriggio',items:[
-        {n:'Trippa verde', q:'30 gr', note:'Non mescolare con altri alimenti fino al momento di servire'},
-        {n:'Olio di cocco', q:'4 gr'}
-      ]},
-      sera:{ico:'🌙',lbl:'Sera',items:[
-        {n:'CSO (Block 2)', q:'35 gr'},
-        {n:'Olio di cocco', q:'4 gr'},
-        {n:'Normalia Extra', q:'½ compressa'}
-      ]}
-    }
-  }
-];
-
-/* ============================================================
-   STATE
-   Remap JS day (0=Sun) → piano index (0=Lun)
-   ============================================================ */
-const JS2IDX = {0:6, 1:0, 2:1, 3:2, 4:3, 5:4, 6:5};
-
-// checked[dayIdx][mealKey][itemIdx] = boolean
-const checked = {};
-for (let d = 0; d < 7; d++) {
-  checked[d] = { mattina:{}, mezzogiorno:{}, pomeriggio:{}, sera:{} };
+function renderStartBox() {
+  const box = document.getElementById('startBox');
+  if (!startDate) { box.innerHTML = ''; return; }
+  box.innerHTML =
+    '<div class="startbox-lbl">Inizio percorso: <strong>' + fmtDisplay(parseKey(startDate)) + '</strong></div>' +
+    '<button class="startbox-edit" onclick="showStartSetup()">Modifica</button>';
 }
 
-let curDay = JS2IDX[new Date().getDay()];
+function renderDateNav() {
+  const nav = document.getElementById('dateNav');
+  const isToday = daysBetween(selDate, new Date()) === 0;
+  const N = dayNumber(selDate);
+  let badge;
+  if (N < 1)              badge = 'Fuori percorso';
+  else if (N <= PERCORSO_GG) badge = 'Giorno ' + N + '/' + PERCORSO_GG + ' · ' + phaseLabel(N);
+  else                    badge = 'Giorno ' + N + ' · ' + phaseLabel(N);
 
-const MEAL_ORDER = ['mattina','mezzogiorno','pomeriggio','sera'];
-const ORG_ICO = { Fegato:'🩸', Milza:'🫁', Cuore:'🫀' };
-
-/* ============================================================
-   RENDER — DAY STRIP
-   ============================================================ */
-function renderStrip() {
-  const strip = document.getElementById('dayStrip');
-  strip.innerHTML = '';
-  for (let d = 0; d < 7; d++) {
-    const p = PIANI[d];
-    const btn = document.createElement('button');
-    btn.className = 'day-pill' + (p.veg ? ' veg' : '') + (d === curDay ? ' on' : '');
-    btn.innerHTML = `<span>${EMOJI_G[d]}</span> ${p.label}`;
-    btn.setAttribute('aria-label', p.label);
-    btn.onclick = () => selDay(d);
-    strip.appendChild(btn);
-  }
-  // Scroll active into center
-  setTimeout(() => {
-    const el = strip.querySelector('.on');
-    if (el) el.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
-  }, 60);
+  nav.innerHTML =
+    '<button class="date-arrow" onclick="shiftDay(-1)" ' + (canPrev() ? '' : 'disabled') + ' aria-label="Giorno precedente">◀</button>' +
+    '<div class="date-center">' +
+      '<div class="date-main' + (isToday ? ' is-today' : '') + '">' + fmtDisplay(selDate) + (isToday ? ' · oggi' : '') + '</div>' +
+      '<span class="date-badge">' + badge + '</span>' +
+    '</div>' +
+    '<button class="date-arrow" onclick="shiftDay(1)" ' + (canNext() ? '' : 'disabled') + ' aria-label="Giorno successivo">▶</button>';
 }
 
-/* ============================================================
-   RENDER — DAY CONTENT
-   ============================================================ */
+function countDone(dk, mk) {
+  if (!checked[dk] || !checked[dk][mk]) return 0;
+  return Object.values(checked[dk][mk]).filter(Boolean).length;
+}
+
+function ensureDateKey(dk) {
+  if (!checked[dk]) checked[dk] = { mattina:{}, mezzogiorno:{}, pomeriggio:{}, sera:{} };
+  for (const mk of MEAL_ORDER) if (!checked[dk][mk]) checked[dk][mk] = {};
+}
+
 function renderDay() {
-  const p = PIANI[curDay];
-  let h = '';
+  const wrap = document.getElementById('dayWrap');
+  const N = dayNumber(selDate);
 
-  /* Banner */
-  h += `
-  <div class="day-banner">
-    <div class="day-banner-emoji">${EMOJI_G[curDay]}</div>
-    <div class="day-banner-body">
-      <h2>${p.label}</h2>
-      <div class="badges">
-        <span class="badge b-org">${ORG_ICO[p.organo] || '🍖'} ${p.organo} 50 gr</span>
-        ${p.veg
-          ? '<span class="badge b-veg">🥦 Con verdura</span>'
-          : '<span class="badge b-tmpl">Senza verdura</span>'}
-        <span class="badge b-tmpl">Template ${p.template}</span>
-      </div>
-    </div>
-  </div>`;
-
-  /* Alerts */
-  for (const a of p.alerts) {
-    h += `<div class="alert alert-${a.t}"><strong>${a.title}</strong>${a.txt}</div>`;
+  /* Data precedente al Giorno 1 → blocco con messaggio */
+  if (N < 1) {
+    wrap.innerHTML =
+      '<div class="block-msg">⛔ <strong>Fuori dal percorso</strong><br>' +
+      'Il percorso nutrizionale inizia il <strong>' + fmtDisplay(parseKey(startDate)) + '</strong>.<br>' +
+      'I giorni precedenti al Giorno 1 non esistono.</div>';
+    return;
   }
 
-  /* Action buttons */
-  h += `
-  <div class="day-actions">
-    <button class="btn btn-exp" onclick="expandAll()">▼ Espandi tutti</button>
-    <button class="btn btn-rst" onclick="resetDay()">↺ Azzera spunte</button>
-  </div>`;
+  const dk = fmtKey(selDate);
+  ensureDateKey(dk);
+  const pasti = buildDay(N);
+  let h = '';
 
   /* Meal cards */
   for (const mk of MEAL_ORDER) {
-    const m = p.pasti[mk];
-    if (!m) continue;
-    const id = 'mc-' + mk;
+    const m = pasti[mk];
+    if (!m || !m.items.length) continue;
+    const id    = 'mc-' + mk;
     const total = m.items.length;
-    const done  = countDone(curDay, mk);
+    const done  = countDone(dk, mk);
     const pct   = total ? (done / total * 100) : 0;
 
-    h += `
-    <div class="meal-card open" id="${id}">
-      <div class="meal-prog"><div class="meal-prog-bar" id="pb-${mk}" style="width:${pct}%"></div></div>
-      <div class="meal-head" onclick="togCard('${id}')">
-        <span class="meal-ico">${m.ico}</span>
-        <span class="meal-name">${m.lbl}</span>
-        <span class="meal-cnt" id="cnt-${mk}">${done}/${total}</span>
-        <span class="meal-arr">▼</span>
-      </div>
-      <div class="meal-body">
-        <ul class="cklist">`;
+    h += '' +
+    '<div class="meal-card open" id="' + id + '">' +
+      '<div class="meal-prog"><div class="meal-prog-bar" id="pb-' + mk + '" style="width:' + pct + '%"></div></div>' +
+      '<div class="meal-head" onclick="togCard(\'' + id + '\')">' +
+        '<span class="meal-ico">' + m.ico + '</span>' +
+        '<span class="meal-name">' + m.lbl + '</span>' +
+        '<span class="meal-cnt" id="cnt-' + mk + '">' + done + '/' + total + '</span>' +
+        '<span class="meal-arr">▼</span>' +
+      '</div>' +
+      '<div class="meal-body"><ul class="cklist">';
 
     for (let i = 0; i < m.items.length; i++) {
       const it = m.items[i];
-      const ck = !!checked[curDay][mk][i];
-      h += `
-          <li class="${ck ? 'done' : ''}${it.opt ? ' opt' : ''}"
-              onclick="togItem(${curDay},'${mk}',${i},'${id}')">
-            <div class="chk"><div class="chk-inner"></div></div>
-            <div class="ci-body">
-              <div class="ci-name">${it.n}</div>
-              ${it.note ? `<div class="ci-note">${it.note}</div>` : ''}
-            </div>
-            <div class="ci-qty">${it.q}</div>
-          </li>`;
+      const ck = !!(checked[dk][mk] && checked[dk][mk][i]);
+      h += '' +
+        '<li class="' + (ck ? 'done' : '') + (it.opt ? ' opt' : '') + '" onclick="togItem(\'' + mk + '\',' + i + ',\'' + id + '\')">' +
+          '<div class="chk"><div class="chk-inner"></div></div>' +
+          '<div class="ci-body">' +
+            '<div class="ci-name">' + it.n + '</div>' +
+            (it.note ? '<div class="ci-note">' + it.note + '</div>' : '') +
+          '</div>' +
+          '<div class="ci-qty">' + it.q + '</div>' +
+        '</li>';
     }
 
-    h += `
-        </ul>
-      </div>
-    </div>`;
+    h += '</ul></div></div>';
   }
 
-  document.getElementById('dayWrap').innerHTML = h;
+  /* Pulsante azzera spunte del giorno */
+  h += '' +
+  '<div class="day-actions">' +
+    '<button class="btn btn-exp" onclick="expandAll()">▼ Espandi tutti</button>' +
+    '<button class="btn btn-rst" onclick="resetDay()">↺ Azzera spunte</button>' +
+  '</div>';
+
+  wrap.innerHTML = h;
 }
 
 /* ============================================================
-   INTERACTIONS
+   INTERAZIONI
    ============================================================ */
-function countDone(d, mk) {
-  return Object.values(checked[d][mk]).filter(Boolean).length;
-}
-
-function selDay(d) {
-  curDay = d;
-  renderStrip();
-  renderDay();
-}
-
-function togItem(d, mk, i, cardId) {
-  checked[d][mk][i] = !checked[d][mk][i];
+function togItem(mk, i, cardId) {
+  const dk = fmtKey(selDate);
+  ensureDateKey(dk);
+  checked[dk][mk][i] = !checked[dk][mk][i];
   const card = document.getElementById(cardId);
   const li   = card.querySelectorAll('.cklist li')[i];
-  li.classList.toggle('done', checked[d][mk][i]);
-  const total = PIANI[d].pasti[mk].items.length;
-  const done  = countDone(d, mk);
-  document.getElementById('cnt-' + mk).textContent = `${done}/${total}`;
-  document.getElementById('pb-'  + mk).style.width = `${total ? done/total*100 : 0}%`;
+  li.classList.toggle('done', checked[dk][mk][i]);
+  const total = buildDay(dayNumber(selDate))[mk].items.length;
+  const done  = countDone(dk, mk);
+  document.getElementById('cnt-' + mk).textContent = done + '/' + total;
+  document.getElementById('pb-'  + mk).style.width = (total ? done/total*100 : 0) + '%';
   saveState();
 }
 
@@ -1040,11 +947,12 @@ function togCard(id) {
 }
 
 function expandAll() {
-  document.querySelectorAll('.meal-card').forEach(c => c.classList.add('open'));
+  document.querySelectorAll('.meal-card').forEach(function(c){ c.classList.add('open'); });
 }
 
 function resetDay() {
-  for (const mk of MEAL_ORDER) checked[curDay][mk] = {};
+  const dk = fmtKey(selDate);
+  checked[dk] = { mattina:{}, mezzogiorno:{}, pomeriggio:{}, sera:{} };
   renderDay();
   saveState();
 }
@@ -1053,8 +961,8 @@ function resetDay() {
    TAB SWITCHING
    ============================================================ */
 function switchTab(id, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
   document.getElementById('pg-' + id).classList.add('on');
   btn.classList.add('on');
 }
@@ -1067,13 +975,23 @@ function tog(id) {
 }
 
 /* ============================================================
+   INIT ASINCRONO (chiamato dopo auth)
+   ============================================================ */
+async function initApp() {
+  await loadState();
+  if (!startDate) { showStartSetup(); return; }
+  selDate = new Date();
+  renderAll();
+}
+
+/* ============================================================
    INIT
    ============================================================ */
 if (sessionStorage.getItem(SESSION_KEY) === '1') {
   document.getElementById('authOverlay').style.display = 'none';
   initApp();
 }
-// Se non autenticato: l'overlay è già visibile, initApp() viene chiamato da checkPwd()
+// Se non autenticato: l'overlay password è già visibile; initApp() parte da checkPwd()
 </script>
 </body>
 </html>
