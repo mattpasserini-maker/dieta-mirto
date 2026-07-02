@@ -722,13 +722,13 @@ function buildDay(N) {
 
   /* MATTINA */
   const mattina = { ico:'🌅', lbl:'Mattina', items:[] };
-  mattina.items.push({ n:'Carne tacchino/pollo cotta', q:'125 gr', note:'Scottata o stufata, pizzico di sale' });
+  mattina.items.push({ n:'Umido REICO', q:reicoQ });
   mattina.items.push({ n:'Omegor-Krill', q:'2 capsule' });
   if (antepsin) mattina.items.push({ n:'Antepsin', q:'1 gr', note:'Idealmente lontano dal pasto — confermare con la vet', opt:true });
 
   /* MEZZOGIORNO */
   const mezzogiorno = { ico:'☀️', lbl:'Mezzogiorno', items:[] };
-  mezzogiorno.items.push({ n:'Umido REICO', q:reicoQ });
+  mezzogiorno.items.push({ n:'Carne tacchino/pollo cotta', q:'125 gr', note:'Scottata o stufata, pizzico di sale' });
   if (hasVerdura)  mezzogiorno.items.push({ n:'Verdura lessata e frullata', q:'40 gr', note:'Finocchio, carote o zucca' });
   if (hasVintegra) mezzogiorno.items.push({ n:'V-Integra Cane Cucciolo', q:vintegraQ });
   if (fermento)    mezzogiorno.items.push(fermento);
@@ -736,12 +736,12 @@ function buildDay(N) {
 
   /* POMERIGGIO */
   const pomeriggio = { ico:'🌤️', lbl:'Pomeriggio', items:[] };
-  pomeriggio.items.push({ n:'Carne tacchino/pollo cotta', q:'125 gr', note:'Scottata o stufata, pizzico di sale' });
+  pomeriggio.items.push({ n:'Umido REICO', q:reicoQ });
   if (hasOlio) pomeriggio.items.push({ n:'Olio di cocco deodorato', q:'8 gr', note:'1 cucchiaio, a crudo al momento di servire' });
 
   /* SERA */
   const sera = { ico:'🌙', lbl:'Sera', items:[] };
-  sera.items.push({ n:'Umido REICO', q:reicoQ });
+  sera.items.push({ n:'Carne tacchino/pollo cotta', q:'125 gr', note:'Scottata o stufata, pizzico di sale' });
   if (antepsin)    sera.items.push({ n:'Antepsin', q:'1 gr', note:'Idealmente lontano dal pasto — confermare con la vet', opt:true });
   if (gastrotaxil) sera.items.push({ n:'Gastrotaxil', q:'2 ml', note:'La sera, prima di dormire', opt:true });
 
